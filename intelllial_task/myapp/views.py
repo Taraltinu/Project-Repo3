@@ -41,6 +41,7 @@ class Login(View):
 		URL = "https://reqres.in/api/login" 
 		response = requests.post(URL,data={"email":email,"password":password})
 		if response.status_code ==200:
+			request.session['user']=email
 			return redirect("user_list")
 		else:
 			return redirect('/')
@@ -67,10 +68,13 @@ class User_Get(View):
 class UserList(View):
 	template_name = "user_list.html"
 	def get(self,request):
-		id= request.GET.get('page', None)
-		URL = f"https://reqres.in/api/users?page={id}"
-		res = requests.get(url = URL).json()
-		return render(request, self.template_name,{"user_list":res})
+		if "user" in request.session:
+			id= request.GET.get('page', None)
+			URL = f"https://reqres.in/api/users?page={id}"
+			res = requests.get(url = URL).json()
+			return render(request, self.template_name,{"user_list":res})
+		else:
+			return redirect("/")
 
 
 
